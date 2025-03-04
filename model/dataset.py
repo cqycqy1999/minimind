@@ -24,14 +24,14 @@ class PretrainDataset(Dataset):
         samples = []
         with open(path, 'r', encoding='utf-8') as f:
             for line_num, line in enumerate(f, 1):
-                data = json.loads(line.strip())
+                data = json.loads(line.strip()) # strip()删除开头和结尾的空格和换行符
                 samples.append(data)
         return samples
 
     def __len__(self):
         return len(self.samples)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index): # 
         sample = self.samples[index]
 
         # 构建输入文本
@@ -43,13 +43,13 @@ class PretrainDataset(Dataset):
             truncation=True,
             return_tensors='pt'
         )
-        input_ids = encoding.input_ids.squeeze()
-        loss_mask = (input_ids != self.tokenizer.pad_token_id)
+        input_ids = encoding.input_ids.squeeze() # 把维度为1的那一维删除掉
+        loss_mask = (input_ids != self.tokenizer.pad_token_id) # 
 
-        X = torch.tensor(input_ids[:-1], dtype=torch.long)
+        X = torch.tensor(input_ids[:-1], dtype=torch.long) # TODO 为了对齐；前n个预测后一个token；
         Y = torch.tensor(input_ids[1:], dtype=torch.long)
         loss_mask = torch.tensor(loss_mask[1:], dtype=torch.long)
-        return X, Y, loss_mask
+        return X, Y, loss_mask # TODO 加了一个input_ids
 
 
 class SFTDataset(Dataset):
